@@ -5,6 +5,8 @@ import common.address.MacAddress;
 import protocol.ethernet.EtherType;
 import protocol.ethernet.EthernetPayload;
 
+import java.util.Objects;
+
 /**
  * ARP Packet.
  * <p>
@@ -34,4 +36,61 @@ public record ArpPacket(
         MacAddress targetHardwareAddress,
         Ipv4Address targetProtocolAddress
 ) implements EthernetPayload {
+    private static final int ETHERNET_ADDRESS_LENGTH = 6;
+    private static final int IPV4_ADDRESS_LENGTH = 4;
+
+    public ArpPacket {
+        Objects.requireNonNull(hardwareType, "hardware type cannot be null");
+        Objects.requireNonNull(protocolType, "protocol type cannot be null");
+        Objects.requireNonNull(operation, "arp operation cannot be null");
+        Objects.requireNonNull(senderHardwareAddress, "sender hardware address cannot be null");
+        Objects.requireNonNull(senderProtocolAddress, "sender protocol address cannot be null");
+        Objects.requireNonNull(targetHardwareAddress, "target hardware address cannot be null");
+        Objects.requireNonNull(targetProtocolAddress, "target protocol address cannot be null");
+
+        if (hardwareLength <= 0) {
+            throw new IllegalArgumentException("hardware length must be positive");
+        }
+
+        if (protocolLength <= 0) {
+            throw new IllegalArgumentException("protocol length must be positive");
+        }
+    }
+
+    public static ArpPacket request(
+            MacAddress senderHardwareAddress,
+            Ipv4Address senderProtocolAddress,
+            Ipv4Address targetProtocolAddress
+    ) {
+        return new ArpPacket(
+                HardwareType.ETHERNET,
+                EtherType.IPV4,
+                ETHERNET_ADDRESS_LENGTH,
+                IPV4_ADDRESS_LENGTH,
+                ArpOperation.REQUEST,
+                senderHardwareAddress,
+                senderProtocolAddress,
+                MacAddress.ZERO,
+                targetProtocolAddress
+        );
+    }
+
+    public static ArpPacket reply(
+            MacAddress senderHardwareAddress,
+            Ipv4Address senderProtocolAddress,
+            MacAddress targetHardwareAddress,
+            Ipv4Address targetProtocolAddress
+    ) {
+        return new ArpPacket(
+                HardwareType.ETHERNET,
+                EtherType.IPV4,
+                ETHERNET_ADDRESS_LENGTH,
+                IPV4_ADDRESS_LENGTH,
+                ArpOperation.REPLY,
+                senderHardwareAddress,
+                senderProtocolAddress,
+                targetHardwareAddress,
+                targetProtocolAddress
+        );
+    }
 }
