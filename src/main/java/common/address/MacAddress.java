@@ -16,5 +16,7 @@ public record MacAddress(
      */
     public static final MacAddress BROADCAST = new MacAddress("FF:FF:FF:FF:FF:FF");
 
+    public static final MacAddress ZERO = new MacAddress("00:00:00:00:00:00");
+
     public boolean isBroadcast() { return this.equals(BROADCAST); }
 } 
